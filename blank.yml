@@ -8,64 +8,36 @@ jogador = input("Vamos salvar o dia, qual seu nome heroi? ")
 print(f"Muito bem {jogador}, seu hp é {hp_heroi}")
 print("voce comeca, selecione uma das opcoes")
 
-atacar = [10, 20, 25, 30, 35, 40, "critico"]
+atacar = [10, 15, 20, 25, 30, 35, 40, "critico"]
 curar = [30, 20, 15, 10, 5, "super_cura"]
 atk_critico = [50, 60, 55, 70]
 spr_cura = [65, 70, 75]
 
-while hp_heroi > 0 and hp_bandido > 0:
-  acao = input("atacar ou se curar? ").strip().lower()
-  acoes = ["atacar","curar"]
-  while acao not in ["atacar","curar"]:
-    print("Opcao invalida!")
+def f_atacar(atk):
+  atk = random.choice(atacar)
+  if atk == "critico":
+     atk = random.choice(atk_critico)
+  return atk
+
+def f_curar(hp):
+  hp = random.choice(curar)
+  if hp == "super_cura":
+    hp = random.choice(spr_cura)
+  return hp
+
+def turno(hp_heroi, hp_bandido):
     acao = input("atacar ou se curar? ").strip().lower()
+    acoes = ["atacar","curar"]
+    while acao not in ["atacar","curar"]:
+      print("Opcao invalida!")
+      acao = input("atacar ou se curar? ").strip().lower()
   
-  bandido_acao = random.choice(acoes)
-  print(f"Bandido escoheu {bandido_acao}")
+    bandido_acao = random.choice(acoes)
+    print(f"Bandido escoheu {bandido_acao}")
 
-  if acao == bandido_acao:
-    print(f"Voce ira {acao}, e bandido tambem ira {bandido_acao}")
-  else:
-    print(f"Voce ira {acao}, e bandido ira {bandido_acao}")
-    
-  if acao == "atacar":
-    jogador_acao = random.choice(atacar)
-    if jogador_acao == "critico":
-      print("VOCE CONSEGUIU UM ATAQUE CRITICO!!!!!")
-      jogador_acao = random.choice(atk_critico)
-    hp_bandido -= jogador_acao
-    print(f"Voce ira tirar {jogador_acao} de hp")
-
-  elif acao == "curar":
-    cura = random.choice(curar)
-    if cura == "super_cura":
-      cura = random.choice(spr_cura)
-      print("VOCE CONSEGUIU UMA SUPER CURA!!!!!")
-    hp_heroi += cura
-    print(f"Voce ira curar {cura} de hp")
-
-  if bandido_acao == "atacar":
-    bandido_dano = random.choice(atacar)
-    if bandido_dano == "critico":
-      bandido_dano = random.choice(atk_critico)
-    hp_heroi -= bandido_dano
-  print(f"Voce perdeu {bandido_dano} de hp")
-
-  if bandido_acao == "curar":
-    bandido_cura = random.choice(curar)
-    if bandido_cura == "super_cura":
-      bandido_cura = random.choice(spr_cura)
-      print("bandido conseguiu uma super cura")
-    hp_bandido += bandido_cura
-    if hp_bandido > hp_max:
-      hp_bandido = hp_max
-      print("Hp ja esta cheio")
+    if acao == bandido_acao:
+      print(f"Voce ira {acao}, e bandido tambem ira {bandido_acao}")
     else:
-      print(f"nessa rodada o bandido curou {bandido_cura}")
- 
-  print(f"Seu hp e {hp_heroi}, e o hp do bandido e {hp_bandido}")
-
-if hp_bandido <= 0:
-  print("Parabens, voce derroutou o bandido ;)")
-else:
-  print("Que pena, o bandido escapou :(")
+      print(f"Voce ira {acao}, e bandido ira {bandido_acao}")
+    
+    if acao == "atacar":
