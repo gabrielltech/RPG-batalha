@@ -1,43 +1,146 @@
 import random
 
-hp_max = 150
-hp_heroi = 150
-hp_bandido = 150
-jogador_acao = "nulo"
 jogador = input("Vamos salvar o dia, qual seu nome heroi? ")
-print(f"Muito bem {jogador}, seu hp é {hp_heroi}")
-print("voce comeca, selecione uma das opcoes")
 
-atacar = [10, 15, 20, 25, 30, 35, 40, "critico"]
-curar = [30, 20, 15, 10, 5, "super_cura"]
-atk_critico = [50, 60, 55, 70]
-spr_cura = [65, 70, 75]
+prsg = ["heroi", "bandido"]
 
-def f_atacar(atk):
-  atk = random.choice(atacar)
-  if atk == "critico":
-     atk = random.choice(atk_critico)
-  return atk
+heroi = {
+"nome": jogador,
+"nivel": 1,
+"acao": ["atacar", "curar"],
+"ataque": [20, 30, 35, 40, 45, 50],
+"defesa": [5, 10],
+"cura": [5, 7, 9, 12],
+"hp": 100,
+"hp_max": 100,
+"historico": []
+}
 
-def f_curar(hp):
-  hp = random.choice(curar)
-  if hp == "super_cura":
-    hp = random.choice(spr_cura)
-  return hp
+bandido = {
+"nome": "bandido",
+"nivel": 0,
+"acao": ["atacar", "curar"],
+"ataque": [10, 15, 15, 20, 25, 40],
+"defesa": [5, 10, 10, 15, 15, 20],
+"cura": [5, 6, 7, 10],
+"hp": 65,
+"hp_max": 65,
+}
 
-def turno(hp_heroi, hp_bandido):
+rodada = 1
+
+print(f"""Muito bem {jogador}, aqui esta seus status:
+========STATUS========
+nome:
+{heroi['nome']}
+nivel:
+{heroi['nivel']}
+ataques:
+{heroi['ataque']}
+defesas:
+{heroi['defesa']}
+curas:
+{heroi['cura']}
+vida:
+{heroi['hp']}
+vida maxima:
+{heroi['hp_max']}
+historico de partidas anteriores:
+{heroi['historico']}
+======================
+""")
+
+def f_atacar(atacante, defensor):
+  dano = random.choice(atacante["ataque"])
+  escudo = random.choice(defensor["defesa"])
+  if dano < escudo:
+    print(f"{defensor['nome']} conseguiu se denfender")
+  else:
+    dano -= escudo
+    defensor["hp"] -= dano
+    if defensor["hp"] <= 0:
+      defensor["hp"] = 0
+    print(f"{atacante['nome']} tirou {dano} de hp")
+  print(f"{heroi['nome']} HP: {heroi['hp']} | {bandido['nome']} HP: {bandido['hp']}")
+  return defensor["hp"]
+
+
+def f_curar(atacante):
+  cura = random.choice(atacante["cura"])
+  atacante["hp"] += cura
+  if atacante["hp"] > atacante["hp_max"]:
+    atacante["hp"] = atacante["hp_max"]
+    print("Seu hp ja esta cheio")
+  else :
+    print(f"{atacante['nome']} curou {cura} de hp")
+  print(f"{heroi['nome']} HP: {heroi['hp']} | {bandido['nome']} HP: {bandido['hp']}")
+  return atacante["hp"]
+
+def turno(atacante, defensor):
+  if atacante == heroi:
     acao = input("atacar ou se curar? ").strip().lower()
-    acoes = ["atacar","curar"]
     while acao not in ["atacar","curar"]:
       print("Opcao invalida!")
       acao = input("atacar ou se curar? ").strip().lower()
-  
-    bandido_acao = random.choice(acoes)
-    print(f"Bandido escoheu {bandido_acao}")
-
-    if acao == bandido_acao:
-      print(f"Voce ira {acao}, e bandido tambem ira {bandido_acao}")
-    else:
-      print(f"Voce ira {acao}, e bandido ira {bandido_acao}")
-    
     if acao == "atacar":
+      print(f"{atacante['nome']} ira atacar, e {defensor['nome']} ira tentar se denfender")
+      f_atacar(atacante, defensor)
+    else:
+      print(f"{atacante['nome']} ira se curar.")
+      f_curar(atacante)
+  else:
+    acao = random.choice(atacante["acao"])
+    if acao == "atacar":
+      print(f"{atacante['nome']} ira atacar, e {defensor['nome']} ira tentar se denfender")
+      f_atacar(atacante, defensor)
+
+    else:
+      print(f"{atacante['nome']} ira se curar.")
+      f_curar(atacante)
+        
+
+while heroi["hp"] > 0 and bandido["hp"] > 0:
+  inicio = input("Presione enter para comecar a rodada ou digite status para ver seus status: ").strip().lower()
+  if inicio == "status":
+    print(f"""Muito bem {jogador}, aqui esta seus status:
+========STATUS========
+nome:
+{heroi['nome']}
+nivel:
+{heroi['nivel']}
+ataques:
+{heroi['ataque']}
+defesas:
+{heroi['defesa']}
+curas:
+{heroi['cura']}
+vida:
+{heroi['hp']}
+vida maxima:
+{heroi['hp_max']}
+historico de partidas anteriores:
+{heroi['historico']}
+======================
+""")
+  else:
+    print(f"{rodada} rodada")
+    rodada += 1
+    vez = random.choice(prsg)
+    if vez == "heroi":
+      turno(heroi, bandido)
+      if bandido["hp"] > 0:
+        turno(bandido, heroi)
+    else:
+      turno(bandido, heroi)
+      if heroi["hp"] > 0:
+        turno(heroi, bandido)
+    
+    
+
+if bandido["hp"] <= 0:
+  print("Parabens, voce derroutou o bandido ;)")
+  heroi["historico"].append(f"Voce ganhou a rodada {rodada[0]}")
+
+else:
+  print("Que pena, o bandido escapou :(")
+  heroi["historico"].append(f"Voce perdeu a rodada {rodada[0]}")
